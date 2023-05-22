@@ -3,6 +3,9 @@ import { Task } from "../models/task";
 import { useForm } from "react-hook-form";
 import { TaskInput } from "../network/tasks_api";
 import * as TasksApi from "../network/tasks_api";
+import TextInputField from "./form/TextInputField";
+import CheckBox from "./form/CheckBox";
+
 
 // ondismiss callback
 interface AddEditTaskDialogProps {
@@ -49,33 +52,31 @@ const AddEditTaskDialog = ({ taskToEdit, onDismiss, onTaskSaved }: AddEditTaskDi
 
             <Modal.Body>
                 <Form id="addEditTaskForm" onSubmit={handleSubmit(onSubmit)}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Task</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="Task name"
-                            isInvalid={!!errors.taskName}
-                            {...register("taskName", { required: "Required" })}
-                        />
-                        <Form.Control.Feedback type="invalid">
-                            {errors.taskName?.message}
-                        </Form.Control.Feedback>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                        <Form.Check
-                            type="checkbox"
-                            label="Is important"
-                            {...register("isImportant")}
-                        />
-                        {taskToEdit &&
-                            <Form.Check
-                                type="checkbox"
-                                label="Is completed"
-                                {...register("isCompleted")}
-                            />
 
-                        }
-                    </Form.Group>
+                    <TextInputField
+                        name="taskName"
+                        label="Task"
+                        type="text"
+                        placeholder="Task name"
+                        register={register}
+                        registerOptions={{ required: "Required" }}
+                        error={errors.taskName}
+                    />
+
+                    <CheckBox
+                        name="isImportant"
+                        label="Is important"
+                        register={register}
+                    />
+                    {
+                        taskToEdit &&
+                        <CheckBox
+                            name="isCompleted"
+                            label="Is completed"
+                            register={register}
+                        />
+                    }
+
 
                 </Form>
             </Modal.Body>
