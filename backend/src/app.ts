@@ -7,6 +7,8 @@ import createHttpError, {isHttpError} from "http-errors";
 import session from "express-session"
 import env from "./util/validateEnv"
 import MongoStore from "connect-mongo";
+import { requiresAuth } from "./middleware/auth";
+
 
 const app = express();
 
@@ -14,12 +16,13 @@ app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+    //res.setHeader('Access-Control-Allow-Origin', '*');
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
     // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, X-Auth-Token');
 
     // Set to true if you need the website to include cookies in the requests sent
     // to the API (e.g. in case you use sessions)
@@ -27,6 +30,10 @@ app.use(function (req, res, next) {
 
     // Pass to next layer of middleware
     next();
+});
+
+app.options('/*', (_, res) => {
+    res.sendStatus(200);
 });
 
 app.use(morgan("dev"));
@@ -46,8 +53,11 @@ app.use(session({
     }),
 }))
 
+
 app.use("/api/users",userRoutes)
-app.use("/api/tasks",tasksRoutes)
+
+
+app.use("/api/tasks",requiresAuth,tasksRoutes)
 
 app.use((req,res,next) =>{
     next(createHttpError(404,"Endpoint not found"));
