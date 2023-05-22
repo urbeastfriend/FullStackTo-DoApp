@@ -38,3 +38,21 @@ export async function createTask(task: TaskInput): Promise<Task>{
 
     return response.json();
 }
+
+
+export async function updateTask(taskId: string, task:TaskInput): Promise<Task> {
+    const response = await fetchData("http://localhost:5000/api/tasks/"+ taskId,
+     {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(task),
+    });
+    return response.json();
+
+}
+
+export async function deleteTask(taskId: string) {
+    await fetchData("http://localhost:5000/api/tasks/" + taskId,{method: "DELETE"});
+}
