@@ -15,3 +15,11 @@
 .checkBoxNotClickable{
     pointer-events: none;
 }
+
+
+.mdDelete{
+    transition: fill .1s ease-in;
+}
+.mdDelete:hover{
+    fill: red;
+}
