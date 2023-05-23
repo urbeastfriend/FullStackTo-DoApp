@@ -2,9 +2,11 @@ import { useForm } from "react-hook-form";
 import { User } from "../models/user";
 import { LoginCredentials } from "../network/tasks_api";
 import * as TasksApi from "../network/tasks_api"
-import { Button, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Form, Modal } from "react-bootstrap";
 import TextInputField from "./form/TextInputField";
 import stylesUtils from "../styles/utils.module.css"
+import {useState} from "react"
+import { CredentialsConflictError, UnauthorizedError } from "../errors/http_errors";
 
 interface LoginDialogProps {
     onDismiss: () => void,
@@ -12,6 +14,8 @@ interface LoginDialogProps {
 }
 
 const LoginDialog = ({ onDismiss, onLoginSuccessful }: LoginDialogProps) => {
+
+    const [errorText, setErrorText] = useState<string|null>(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginCredentials>();
 
@@ -22,7 +26,13 @@ const LoginDialog = ({ onDismiss, onLoginSuccessful }: LoginDialogProps) => {
             onLoginSuccessful(user);
 
         } catch (error) {
-            alert(error);
+            if(error instanceof UnauthorizedError)
+            {
+                setErrorText(error.message);
+            }
+            else{
+                alert(error);
+            }
             console.error(error);
         }
     }
@@ -35,6 +45,11 @@ const LoginDialog = ({ onDismiss, onLoginSuccessful }: LoginDialogProps) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {errorText &&
+                <Alert variant="danger">
+                    {errorText}
+                </Alert>
+                }
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="username"

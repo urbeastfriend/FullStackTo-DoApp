@@ -1,6 +1,6 @@
 
 
-const NotesPageLoggedOutView = () => {
+const TasksPageLoggedOutView = () => {
 
     return ( 
         <p>
@@ -9,4 +9,4 @@ const NotesPageLoggedOutView = () => {
      );
 }
  
-export default NotesPageLoggedOutView;
+export default TasksPageLoggedOutView;

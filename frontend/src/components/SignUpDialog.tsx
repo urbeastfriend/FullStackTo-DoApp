@@ -2,9 +2,11 @@ import { useForm } from "react-hook-form";
 import { SignUpCredentials } from "../network/tasks_api";
 import * as TasksApi from "../network/tasks_api";
 import { User } from "../models/user";
-import { Button, Form, Modal } from "react-bootstrap";
+import { Alert, Button, Form, Modal } from "react-bootstrap";
 import TextInputField from "./form/TextInputField";
 import stylesUtils from "../styles/utils.module.css"
+import {useState} from "react"
+import { CredentialsConflictError } from "../errors/http_errors";
 
 interface SignUpDialogProps {
     onDismiss: () => void,
@@ -12,6 +14,8 @@ interface SignUpDialogProps {
 }
 
 const SignUpDialog = ({ onDismiss, onSignUpSuccessful }: SignUpDialogProps) => {
+
+    const [errorText, setErrorText] = useState<string|null>(null);
 
     const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<SignUpCredentials>()
 
@@ -22,8 +26,14 @@ const SignUpDialog = ({ onDismiss, onSignUpSuccessful }: SignUpDialogProps) => {
             onSignUpSuccessful(newUser);
 
         } catch (error) {
-            alert(error);
-            console.log(error);
+            if(error instanceof CredentialsConflictError)
+            {
+                setErrorText(error.message);
+            }
+            else{
+                alert(error);
+            }
+            console.error(error);
         }
     }
 
@@ -36,6 +46,12 @@ const SignUpDialog = ({ onDismiss, onSignUpSuccessful }: SignUpDialogProps) => {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
+                {errorText&& 
+                <Alert variant="danger">
+                    {errorText}
+                </Alert>
+                }
+                
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <TextInputField
                         name="username"
