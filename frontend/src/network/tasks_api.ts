@@ -1,3 +1,4 @@
+import { CredentialsConflictError, UnauthorizedError } from "../errors/http_errors";
 import { Task } from "../models/task";
 import { User } from "../models/user"
 
@@ -17,8 +18,18 @@ async function fetchData(input: RequestInfo, _init?: RequestInit) {
     }
     else {
         const errorBody = await response.json();
-        const errorMessage = errorBody.console.error;
-        throw Error(errorMessage);
+        const errorMessage = errorBody.error;
+
+        if(response.status === 401){
+            throw new UnauthorizedError(errorMessage);
+        }
+        else if(response.status === 409){
+            throw new CredentialsConflictError(errorMessage);
+        }
+        else{
+            throw Error("Request failed with status: "+ response.status + " message: " + errorMessage);
+        }
+
     }
 }
 
